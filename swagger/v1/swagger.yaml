@@ -1,0 +1,249 @@
+---
+openapi: 3.0.1
+info:
+  title: Todos API
+  version: v1
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+paths:
+  "/signup":
+    post:
+      summary: Signup
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '201':
+          description: created
+        '422':
+          description: invalid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      example: me@example.com
+                    password:
+                      type: string
+                      example: Password1!
+                    password_confirmation:
+                      type: string
+                      example: Password1!
+                  required:
+                  - email
+                  - password
+                  - password_confirmation
+              required:
+              - user
+  "/auth/login":
+    post:
+      summary: Login
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '200':
+          description: ok
+        '401':
+          description: invalid credentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      example: me@example.com
+                    password:
+                      type: string
+                      example: Password1!
+                  required:
+                  - email
+                  - password
+              required:
+              - user
+  "/auth/logout":
+    get:
+      summary: Logout
+      tags:
+      - Auth
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer <token>
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ok
+        '401':
+          description: unauthorized
+  "/todos":
+    get:
+      summary: List all todos and items
+      tags:
+      - Todos
+      responses:
+        '200':
+          description: ok
+    post:
+      summary: Create a todo
+      tags:
+      - Todos
+      parameters: []
+      responses:
+        '201':
+          description: created
+        '422':
+          description: invalid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: My todo
+                created_by:
+                  type: string
+                  example: Panos
+              required:
+              - title
+              - created_by
+  "/todos/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Get a todo
+      tags:
+      - Todos
+      responses:
+        '200':
+          description: ok
+        '404':
+          description: not found
+    put:
+      summary: Update a todo
+      tags:
+      - Todos
+      parameters: []
+      responses:
+        '204':
+          description: no content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Updated title
+    delete:
+      summary: Delete a todo and its items
+      tags:
+      - Todos
+      responses:
+        '204':
+          description: no content
+  "/todos/{id}/items":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    post:
+      summary: Create a new todo item
+      tags:
+      - Items
+      parameters: []
+      responses:
+        '201':
+          description: created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Buy milk
+                done:
+                  type: boolean
+                  example: false
+              required:
+              - name
+  "/todos/{id}/items/{iid}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    - name: iid
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Get a todo item
+      tags:
+      - Items
+      responses:
+        '200':
+          description: ok
+    put:
+      summary: Update a todo item
+      tags:
+      - Items
+      parameters: []
+      responses:
+        '204':
+          description: no content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Buy bread
+                done:
+                  type: boolean
+                  example: true
+    delete:
+      summary: Delete a todo item
+      tags:
+      - Items
+      responses:
+        '204':
+          description: no content
+servers:
+- url: https://{defaultHost}
+  variables:
+    defaultHost:
+      default: www.example.com
